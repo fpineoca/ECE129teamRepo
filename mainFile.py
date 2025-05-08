@@ -140,5 +140,3 @@ except KeyboardInterrupt:
     stream.stop_stream()
     stream.close()
     p.terminate()
-message.txt
-5 KB
