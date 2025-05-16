@@ -1,0 +1,3 @@
+﻿"boxHeight"= 40mm
+"boxExtension" = 25mm
+"D1@Boss-Extrude1"="boxExtension"

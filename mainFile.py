@@ -17,6 +17,8 @@ LED_DMA        = 10       # DMA channel to use for PWM generation
 LED_BRIGHTNESS = 200      # Default brightness (0-255)
 LED_INVERT     = False    # True to invert the signal
 LED_CHANNEL    = 0
+MAXRAWDIFF = 1500.0
+SCALINGRATIO1 = LED_COUNT/MAXRAWDIFF
 
 SAMPLE_SIZE = 2048
 bSize = int(SAMPLE_SIZE / LED_COUNT)
@@ -90,13 +92,15 @@ for i in range(p.get_device_count()):
 
 # Open audio stream
 stream = p.open(format=FORMAT,
-                channels=1,
+                channels=CHANNELS,
                 rate=RATE,
                 input=True,
                 input_device_index=1,
                 frames_per_buffer=CHUNK)
 
 # Main loop
+
+
 try:
     while True:
         # === NEW: Read potentiometer inputs ===
@@ -110,7 +114,17 @@ try:
         audio_dat = np.frombuffer(data, dtype=np.int16)
 
         # Sound level scaling
-        scaledLevel = abs(max(audio_dat) - min(audio_dat)) * 300.0 / 1500.0
+        #parse the audio data list to search for max and min simultaniously
+        #to save runtime since the list is quite long
+        max = -99999
+        min = 99999
+        for i in len(audio_dat):
+            if audio_dat[i] > max:
+                max = audio_dat[i]
+            if audio_dat[i] < min:
+                min = audio_dat[i]
+
+        scaledLevel = (max - min) * SCALINGRATIO1
         scaledLevel -= 10
         scaledLevel = max(0, min(scaledLevel, 299))
 
